@@ -1,4 +1,4 @@
-name: sign-in ing
+name: sign-in ing  
 
 on:  
   push:  
@@ -25,8 +25,8 @@ jobs:
           pip install -r requirements.txt  # 如果有依赖库，确保在 requirements.txt 中列出  
       
       - name: Run signment_02.py  
-        run: python ./signment_02.py  # 运行根目录下的 signment_02.py 脚本
+        run: python ./signment_02.py  # 运行根目录下的 signment_02.py 脚本  
 
       - name: Run Tests  
         run: |  
-          python test_sign_in.py  # 运行你的测试文件  
+          python test_sign_in.py  # 运行你的测试文件
