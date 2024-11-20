@@ -1,32 +1,42 @@
-name: sign-in ing  
+name: sign-in
 
-on:  
-  push:  
-    branches:  
-      - main  
-  pull_request:  
-    branches:  
-      - main  
+on:
+  schedule:
+    - cron: '08 8 * * 1-5'   # 每个工作日 8:08 运行
+    - cron: '08 10 * * 1-5'  # 每个工作日 10:08 运行
+    - cron: '58 15 * * 2'    # 每周二 15:58 运行
+    - cron: '58 17 * * 2'    # 每周二 17:58 运行
+    - cron: '08 10 * * 1'    # 每周一 10:08 运行
+    - cron: '08 10 * * 3'    # 每周三 10:08 运行
+    - cron: '08 8 * * 4'     # 每周四 8:08 运行
+    - cron: '08 10 * * 4'    # 每周四 10:08 运行
+    - cron: '08 8 * * 5'     # 每周五 8:08 运行
+    - cron: '08 10 * * 5'    # 每周五 10:08 运行
 
-jobs:  
-  run_script:  
-    runs-on: ubuntu-latest  
-    steps:  
-      - name: Checkout code  
-        uses: actions/checkout@v2  
-      
-      - name: Set up Python  
-        uses: actions/setup-python@v2  
-        with:  
-          python-version: '3.9'  # 替换为可以使用的 Python 版本  
-      
-      - name: Install dependencies  
-        run: |  
-          pip install -r requirements.txt  # 如果有依赖库，确保在 requirements.txt 中列出  
-      
-      - name: Run signment_02.py  
-        run: python ./signment_02.py  # 运行根目录下的 signment_02.py 脚本  
+jobs:
+  run_script:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10  # 设置超时时间为 10 分钟
+    env:
+      TZ: Asia/Shanghai  # 设置时区为亚洲/上海
 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+      
+      - name: Run signment_02.py
+        run: |
+          python ./signment_02.py
+          
       - name: Run Tests  
         run: |  
           python test_sign_in.py  # 运行你的测试文件
