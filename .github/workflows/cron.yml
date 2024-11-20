@@ -1,0 +1,32 @@
+name: sign-in ing
+
+on:  
+  push:  
+    branches:  
+      - main  
+  pull_request:  
+    branches:  
+      - main  
+
+jobs:  
+  run_script:  
+    runs-on: ubuntu-latest  
+    steps:  
+      - name: Checkout code  
+        uses: actions/checkout@v2  
+      
+      - name: Set up Python  
+        uses: actions/setup-python@v2  
+        with:  
+          python-version: '3.9'  # 替换为可以使用的 Python 版本  
+      
+      - name: Install dependencies  
+        run: |  
+          pip install -r requirements.txt  # 如果有依赖库，确保在 requirements.txt 中列出  
+      
+      - name: Run signment_02.py  
+        run: python ./signment_02.py  # 运行根目录下的 signment_02.py 脚本
+
+      - name: Run Tests  
+        run: |  
+          python test_sign_in.py  # 运行你的测试文件  
