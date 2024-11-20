@@ -1,11 +1,11 @@
 from urllib.parse import urlencode
-
 import requests
 import json
 import schedule
 import time
 from datetime import datetime, timedelta
 import logging
+import pytz  # 导入 pytz 库
 
 # 配置日志
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -36,8 +36,11 @@ headers = {
 # 当前周数
 current_week = 12
 
+# 设置中国时区
+china_tz = pytz.timezone('Asia/Shanghai')
+
 # 计算下周一的日期
-next_monday = datetime.now() + timedelta(days=(7 - datetime.now().weekday()))
+next_monday = datetime.now(china_tz) + timedelta(days=(7 - datetime.now(china_tz).weekday()))
 next_monday = next_monday.replace(hour=0, minute=0, second=0, microsecond=0)
 
 # 定义签到任务
@@ -63,7 +66,6 @@ sign_in_tasks = {
     ]
 }
 
-
 # 定义签到函数
 def sign_in(sr_id, week):
     params = params_template.copy()
@@ -84,7 +86,6 @@ def sign_in(sr_id, week):
         logging.error(f"签到失败，状态码：{response.status_code}")
         logging.error(f"响应内容：{response.text}")
 
-
 # 设置定时任务
 def schedule_sign_in():
     for day, tasks in sign_in_tasks.items():
@@ -93,19 +94,20 @@ def schedule_sign_in():
             try:
                 # 验证时间格式
                 datetime.strptime(time_str, '%H:%M')
+                # 使用中国时间设置签到任务
+                schedule_time = f"{time_str}:00"  # 将签到时间格式化为 HH:MM:SS
                 if day == 'Monday':
-                    schedule.every().monday.at(time_str).do(sign_in, task['sr_id'], current_week)
+                    schedule.every().monday.at(schedule_time).do(sign_in, task['sr_id'], current_week)
                 elif day == 'Tuesday':
-                    schedule.every().tuesday.at(time_str).do(sign_in, task['sr_id'], current_week)
+                    schedule.every().tuesday.at(schedule_time).do(sign_in, task['sr_id'], current_week)
                 elif day == 'Wednesday':
-                    schedule.every().wednesday.at(time_str).do(sign_in, task['sr_id'], current_week)
+                    schedule.every().wednesday.at(schedule_time).do(sign_in, task['sr_id'], current_week)
                 elif day == 'Thursday':
-                    schedule.every().thursday.at(time_str).do(sign_in, task['sr_id'], current_week)
+                    schedule.every().thursday.at(schedule_time).do(sign_in, task['sr_id'], current_week)
                 elif day == 'Friday':
-                    schedule.every().friday.at(time_str).do(sign_in, task['sr_id'], current_week)
+                    schedule.every().friday.at(schedule_time).do(sign_in, task['sr_id'], current_week)
             except ValueError:
                 logging.error(f"无效的时间格式：{time_str}")
-
 
 # 更新周数
 def update_week():
@@ -115,12 +117,11 @@ def update_week():
     schedule.clear()  # 清除所有任务
     schedule_sign_in()  # 重新设置任务
 
-
 # 主循环
 if __name__ == "__main__":
     schedule_sign_in()
     while True:
-        now = datetime.now()
+        now = datetime.now(china_tz)  # 获取当前中国时间
         if now >= next_monday:
             next_monday += timedelta(days=7)
             update_week()
